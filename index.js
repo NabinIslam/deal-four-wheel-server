@@ -19,27 +19,27 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
-function run() {
+async function run() {
   try {
     const categoriesCollection = client
       .db('DealFourWheel')
       .collection('categories');
 
+    // categories api
     app.get('/categories', async (req, res) => {
       const categories = await categoriesCollection.find({}).toArray();
       res.send(categories);
     });
-    
   } finally {
   }
 }
 
 run().catch(err => console.error(err));
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   res.send('DealFourWheel server is running');
 });
 
-app.listen(port, () => {
-  `DealFourWheel server is running on port:${port}`;
-});
+app.listen(port, () =>
+  console.log(`DealFourWheel server is running on port:${port}`)
+);
