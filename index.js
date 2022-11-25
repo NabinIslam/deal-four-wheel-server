@@ -24,11 +24,25 @@ async function run() {
     const categoriesCollection = client
       .db('DealFourWheel')
       .collection('categories');
+    const usersCollection = client.db('DealFourWheel').collection('users');
 
     // categories api
     app.get('/categories', async (req, res) => {
       const categories = await categoriesCollection.find({}).toArray();
       res.send(categories);
+    });
+
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.get('/user/buyer/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isBuyer: user?.role === 'buyer' });
     });
   } finally {
   }
