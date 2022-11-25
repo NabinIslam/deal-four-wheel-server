@@ -74,11 +74,24 @@ async function run() {
       res.send(users);
     });
 
+    app.delete('/user/:id', varifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const result = await usersCollection.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+
     app.get('/users/sellers', async (req, res) => {
       const sellers = await usersCollection
         .find({ role: { $eq: 'seller' } })
         .toArray();
       res.send(sellers);
+    });
+
+    app.get('/users/buyers', async (req, res) => {
+      const buyers = await usersCollection
+        .find({ role: { $eq: 'buyer' } })
+        .toArray();
+      res.send(buyers);
     });
 
     app.get('/user/buyer/:email', async (req, res) => {
