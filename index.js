@@ -69,6 +69,18 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/users', async (req, res) => {
+      const users = await usersCollection.find({}).toArray();
+      res.send(users);
+    });
+
+    app.get('/users/sellers', async (req, res) => {
+      const sellers = await usersCollection
+        .find({ role: { $eq: 'seller' } })
+        .toArray();
+      res.send(sellers);
+    });
+
     app.get('/user/buyer/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email };
