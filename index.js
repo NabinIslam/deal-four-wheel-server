@@ -74,6 +74,29 @@ async function run() {
       res.send(users);
     });
 
+    app.put('/user/:id', varifyJWT, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      const query = { email: decodedEmail };
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== 'admin') {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          verified: true,
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+
     app.delete('/user/:id', varifyJWT, async (req, res) => {
       const id = req.params.id;
       const result = await usersCollection.deleteOne({ _id: ObjectId(id) });
