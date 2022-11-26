@@ -43,6 +43,9 @@ async function run() {
       .db('DealFourWheel')
       .collection('categories');
     const usersCollection = client.db('DealFourWheel').collection('users');
+    const productsCollection = client
+      .db('DealFourWheel')
+      .collection('products');
 
     app.get('/jwt', async (req, res) => {
       const email = req.query.email;
@@ -136,6 +139,19 @@ async function run() {
       const query = { email };
       const user = await usersCollection.findOne(query);
       res.send({ isAdmin: user?.role === 'admin' });
+    });
+
+    app.post('/products', varifyJWT, async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+
+      res.send(result);
+    });
+
+    app.get('/products', async (req, res) => {
+      const products = await productsCollection.find({}).toArray();
+
+      res.send(products);
     });
   } finally {
   }
