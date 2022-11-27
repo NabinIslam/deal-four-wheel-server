@@ -153,6 +153,15 @@ async function run() {
 
       res.send(products);
     });
+
+    app.get('/user/products/:email', async (req, res) => {
+      const email = req.params.email;
+      const currentUsersProducts = await productsCollection
+        .find({ sellerEmail: { $eq: email } })
+        .toArray();
+      res.send(currentUsersProducts);
+    });
+    
   } finally {
   }
 }
