@@ -46,6 +46,9 @@ async function run() {
     const productsCollection = client
       .db('DealFourWheel')
       .collection('products');
+    const bookingsCollection = client
+      .db('DealFourWheel')
+      .collection('bookings');
 
     app.get('/jwt', async (req, res) => {
       const email = req.query.email;
@@ -149,9 +152,20 @@ async function run() {
     });
 
     app.get('/products', async (req, res) => {
-      const products = await productsCollection.find({}).toArray();
+      const products = await productsCollection.find({}).limit(3).toArray();
 
       res.send(products);
+    });
+
+    app.get('/products/:category', async (req, res) => {
+      const category = req.params.category;
+      const categoryProducts = await productsCollection
+        .find({
+          category: { $eq: category },
+        })
+        .toArray();
+
+      res.send(categoryProducts);
     });
 
     app.get('/user/products/:email', async (req, res) => {
@@ -161,7 +175,17 @@ async function run() {
         .toArray();
       res.send(currentUsersProducts);
     });
-    
+
+    app.post('/bookings', varifyJWT, async (req, res) => {
+      const booking = req.body;
+      const result = await bookingsCollection.insertOne(booking);
+      res.send(result);
+    });
+
+    app.get('/bookings', async (req, res) => {
+      const bookings = await bookingsCollection.find({}).toArray();
+      res.send(bookings);
+    });
   } finally {
   }
 }
