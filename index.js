@@ -39,6 +39,8 @@ function varifyJWT(req, res, next) {
 
 async function run() {
   try {
+    // collections
+
     const categoriesCollection = client
       .db('DealFourWheel')
       .collection('categories');
@@ -49,6 +51,8 @@ async function run() {
     const bookingsCollection = client
       .db('DealFourWheel')
       .collection('bookings');
+
+    // jwt token
 
     app.get('/jwt', async (req, res) => {
       const email = req.query.email;
@@ -75,6 +79,7 @@ async function run() {
       res.send(result);
     });
 
+    //users api
     app.get('/users', async (req, res) => {
       const users = await usersCollection.find({}).toArray();
       res.send(users);
@@ -103,18 +108,23 @@ async function run() {
       res.send(result);
     });
 
+    // users naming convention start
+
     app.delete('/user/:id', varifyJWT, async (req, res) => {
       const id = req.params.id;
       const result = await usersCollection.deleteOne({ _id: ObjectId(id) });
       res.send(result);
     });
 
+    // sellers api
     app.get('/users/sellers', async (req, res) => {
       const sellers = await usersCollection
         .find({ role: { $eq: 'seller' } })
         .toArray();
       res.send(sellers);
     });
+
+    // buyers api
 
     app.get('/users/buyers', async (req, res) => {
       const buyers = await usersCollection
@@ -123,6 +133,8 @@ async function run() {
       res.send(buyers);
     });
 
+    // single buyer api
+
     app.get('/user/buyer/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email };
@@ -130,12 +142,15 @@ async function run() {
       res.send({ isBuyer: user?.role === 'buyer' });
     });
 
+    // single seller api
     app.get('/user/seller/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email };
       const user = await usersCollection.findOne(query);
       res.send({ isSeller: user?.role === 'seller' });
     });
+
+    // admin api
 
     app.get('/user/admin/:email', async (req, res) => {
       const email = req.params.email;
@@ -144,6 +159,10 @@ async function run() {
       res.send({ isAdmin: user?.role === 'admin' });
     });
 
+    // users naming convention end
+
+    // products naming convention start
+
     app.post('/products', varifyJWT, async (req, res) => {
       const product = req.body;
       const result = await productsCollection.insertOne(product);
@@ -151,11 +170,15 @@ async function run() {
       res.send(result);
     });
 
+    // products api
+
     app.get('/products', async (req, res) => {
       const products = await productsCollection.find({}).limit(3).toArray();
 
       res.send(products);
     });
+
+    // category products api
 
     app.get('/products/:category', async (req, res) => {
       const category = req.params.category;
@@ -168,6 +191,8 @@ async function run() {
       res.send(categoryProducts);
     });
 
+    // single user's products api
+
     app.get('/user/products/:email', async (req, res) => {
       const email = req.params.email;
       const currentUsersProducts = await productsCollection
@@ -176,16 +201,24 @@ async function run() {
       res.send(currentUsersProducts);
     });
 
+    // products naming convention end
+
+    // bookings naming convention start
+
     app.post('/bookings', varifyJWT, async (req, res) => {
       const booking = req.body;
       const result = await bookingsCollection.insertOne(booking);
       res.send(result);
     });
 
+    // bookings api
+
     app.get('/bookings', async (req, res) => {
       const bookings = await bookingsCollection.find({}).toArray();
       res.send(bookings);
     });
+
+    // products naming convention end
   } finally {
   }
 }
